@@ -1,7 +1,7 @@
 wrenchat
 ===
 
-![assets/logo.png](./assets/logo.png | width=400)
+<img src="/assets/logo.png" width="400">
 
 A secure, asymmetrically (RSA) encrypted chat service written in Go.
 
