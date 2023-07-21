@@ -6,12 +6,6 @@ import (
 	"net"
 )
 
-type ServerRequest struct {
-	Room string `json:"room"`
-	Msg  string `json:"msg"`
-	Type string `json:"type"`
-}
-
 type Server struct {
 	Rooms []*Room
 	Name  string
@@ -61,7 +55,7 @@ func handleRequest(conn net.Conn) {
 		}
 
 		// parse data received into request
-		var data ServerRequest
+		var data map[string]string
 		err = json.Unmarshal(buf[:len], &data)
 		if err != nil {
 			fmt.Println("error unmarshalling:", err.Error())
@@ -69,10 +63,15 @@ func handleRequest(conn net.Conn) {
 		}
 
 		// handle msg
-		if data.Type == "test" {
-			fmt.Println("msg received!", data.Msg)
-		} else {
-			fmt.Println("invalid type", data.Type, data.Room, data.Msg)
+		var m []byte
+		t := data["type"]
+		if t == "" {
+			m, err = NewMessageBytes("server", "invalid type")
+			if err != nil {
+				fmt.Println("error creating message", err)
+			}
 		}
+
+		conn.Write(m)
 	}
 }
