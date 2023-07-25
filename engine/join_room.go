@@ -6,7 +6,7 @@ import (
 	"net"
 )
 
-func CmdJoinRoom(data map[string]string, conn net.Conn) {
+func CmdJoinRoom(userID int, data map[string]string, conn net.Conn) {
 	addr := data["addr"]
 
 	if addr == "" {
@@ -43,6 +43,8 @@ func CmdJoinRoom(data map[string]string, conn net.Conn) {
 		return
 	}
 
-	r.Users[conn] = newUser
+	fmt.Println("User joined with ID ", userID, newUser.ID)
+
+	r.Users[userID] = newUser
 	r.SendRawToAll(NewMessageBytes("user joined", "server", util.PubKeyToString(newUser.PublicKey)))
 }

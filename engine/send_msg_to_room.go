@@ -2,7 +2,7 @@ package engine
 
 import "net"
 
-func CmdSendMsgToRoom(data map[string]string, conn net.Conn) {
+func CmdSendMsgToRoom(userID int, data map[string]string, conn net.Conn) {
 	addr := data["addr"]
 	if addr == "" {
 		conn.Write(NewMessageBytes("error", "server", "invalid addr"))
@@ -22,7 +22,7 @@ func CmdSendMsgToRoom(data map[string]string, conn net.Conn) {
 	}
 
 	// get user
-	u := r.Users[conn]
+	u := r.Users[userID]
 
 	r.SendEncryptedMessageToAll(u.ID, msg)
 }

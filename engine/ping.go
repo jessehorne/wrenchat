@@ -4,6 +4,6 @@ import (
 	"net"
 )
 
-func CmdPing(data map[string]string, conn net.Conn) {
+func CmdPing(userID int, data map[string]string, conn net.Conn) {
 	conn.Write(NewMessageBytes("pong", "server", "pong"))
 }

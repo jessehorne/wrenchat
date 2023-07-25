@@ -2,21 +2,21 @@ package engine
 
 import "net"
 
-var Commands map[string]func(map[string]string, net.Conn)
+var Commands map[string]func(int, map[string]string, net.Conn)
 
-func AddCommand(t string, f func(map[string]string, net.Conn)) {
+func AddCommand(t string, f func(int, map[string]string, net.Conn)) {
 	Commands[t] = f
 }
 
 func InitCommands() {
-	Commands = map[string]func(map[string]string, net.Conn){}
+	Commands = map[string]func(int, map[string]string, net.Conn){}
 }
 
-func RunCommand(t string, data map[string]string, conn net.Conn) {
+func RunCommand(userID int, t string, data map[string]string, conn net.Conn) {
 	_, exists := Commands[t]
 
 	if exists {
-		Commands[t](data, conn)
+		Commands[t](userID, data, conn)
 		return
 	}
 

@@ -45,6 +45,7 @@ func (s *Server) Start(port string) error {
 	AddCommand("create room", CmdCreateRoom)
 	AddCommand("join room", CmdJoinRoom)
 
+	userCount := 0
 	for {
 		// listen for incoming connection
 		conn, err := l.Accept()
@@ -52,11 +53,12 @@ func (s *Server) Start(port string) error {
 			return err
 		}
 
-		go handleRequest(conn)
+		userCount += 1
+		go handleRequest(userCount, conn)
 	}
 }
 
-func handleRequest(conn net.Conn) {
+func handleRequest(userID int, conn net.Conn) {
 	for {
 		buf := make([]byte, 1024)
 
@@ -75,6 +77,6 @@ func handleRequest(conn net.Conn) {
 		}
 
 		// handle request
-		RunCommand(data["cmd"], data, conn)
+		RunCommand(userID, data["cmd"], data, conn)
 	}
 }

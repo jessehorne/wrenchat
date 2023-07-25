@@ -1,16 +1,16 @@
 package engine
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/jessehorne/wrenchat/util"
-	"net"
 )
 
 type Room struct {
 	Name     string
 	Password string
 	Address  string // kind of like the mailing address of a room that clients use to route messages
-	Users    map[net.Conn]*User
+	Users    map[int]*User
 }
 
 func NewRoom(name, password string) *Room {
@@ -18,11 +18,13 @@ func NewRoom(name, password string) *Room {
 		Name:     name,
 		Password: password,
 		Address:  uuid.NewString(),
+		Users:    map[int]*User{},
 	}
 }
 
 func (r *Room) SendRawToAll(msg []byte) error {
 	for _, u := range r.Users {
+		fmt.Println("sending raw to user", u.ID)
 		u.Connection.Write(msg)
 	}
 

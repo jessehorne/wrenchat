@@ -2,7 +2,7 @@ package engine
 
 import "net"
 
-func CmdCreateRoom(data map[string]string, conn net.Conn) {
+func CmdCreateRoom(userID int, data map[string]string, conn net.Conn) {
 	name := data["room"]
 	password := data["password"]
 

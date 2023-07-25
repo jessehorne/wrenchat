@@ -24,16 +24,14 @@ func ParsePubKey(key string) (*rsa.PublicKey, error) {
 	if pubPem == nil {
 		return nil, errors.New("could not decode key")
 	}
-	if pubPem.Type != "RSA PUBLIC KEY" {
-		return nil, errors.New("invalid pub key")
-	}
+
 	pubPemBytes := pubPem.Bytes
-	parsedPubKey, err := x509.ParsePKCS1PublicKey(pubPemBytes)
+	parsedPubKey, err := x509.ParsePKIXPublicKey(pubPemBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	return parsedPubKey, nil
+	return parsedPubKey.(*rsa.PublicKey), nil
 }
 
 func PubKeyToString(key *rsa.PublicKey) string {
