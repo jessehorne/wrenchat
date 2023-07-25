@@ -21,24 +21,23 @@ func NewRoom(name, password string) *Room {
 	}
 }
 
-func (r *Room) SendMessage(msg []byte) error {
+func (r *Room) SendRawToAll(msg []byte) error {
 	for _, u := range r.Users {
-		data, err := util.EncryptWithPubKey(msg, u.PublicKey)
-		if err != nil {
-			return err
-		}
-
-		msg, err := NewMessageBytes(u.ID, string(data))
-		if err != nil {
-			return err
-		}
-
 		u.Connection.Write(msg)
 	}
 
 	return nil
 }
 
-func (r *Room) ConnectUser(conn net.Conn) {
-	r.Users[conn] = NewUser(conn)
+func (r *Room) SendEncryptedMessageToAll(from string, msg string) error {
+	for _, u := range r.Users {
+		data, err := util.EncryptWithPubKey([]byte(msg), u.PublicKey)
+		if err != nil {
+			return err
+		}
+
+		u.Connection.Write(NewMessageBytes("msg", from, string(data)))
+	}
+
+	return nil
 }

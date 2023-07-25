@@ -7,11 +7,13 @@ import (
 )
 
 type Server struct {
-	Rooms []*Room
+	Rooms map[string]*Room
 	Name  string
 	Desc  string
 	Port  string
 }
+
+var Serv *Server
 
 func NewServer(name string, desc string, port string) *Server {
 	return &Server{
@@ -22,6 +24,9 @@ func NewServer(name string, desc string, port string) *Server {
 }
 
 func (s *Server) Start(port string) error {
+	Serv = s
+	s.Rooms = map[string]*Room{}
+
 	// listen for connections
 	l, err := net.Listen("tcp", "localhost:"+port)
 	if err != nil {
@@ -32,6 +37,13 @@ func (s *Server) Start(port string) error {
 	defer l.Close()
 
 	fmt.Printf("Server %v started on port %v\n", s.Name, s.Port)
+
+	// Add commands
+	InitCommands()
+	AddCommand("ping", CmdPing)
+	AddCommand("msg", CmdSendMsgToRoom)
+	AddCommand("create room", CmdCreateRoom)
+	AddCommand("join room", CmdJoinRoom)
 
 	for {
 		// listen for incoming connection
@@ -62,16 +74,7 @@ func handleRequest(conn net.Conn) {
 			return
 		}
 
-		// handle msg
-		var m []byte
-		t := data["type"]
-		if t == "" {
-			m, err = NewMessageBytes("server", "invalid type")
-			if err != nil {
-				fmt.Println("error creating message", err)
-			}
-		}
-
-		conn.Write(m)
+		// handle request
+		RunCommand(data["cmd"], data, conn)
 	}
 }
